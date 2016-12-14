@@ -1,6 +1,9 @@
 # OSX
 .DS_Store
 
+# Encrption
+cipher/
+
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a
