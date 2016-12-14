@@ -5,6 +5,5 @@ The goal of this project is to have a fully capable server run on a Raspberry Pi
 
 Language-wise, `Go` is the chosen one. No questions asked. Setup guide is at [How to write Go code?](https://golang.org/doc/code.html)
 
-----
 ## Http Requests
 Exact format and specs see [Wiki Page](https://github.com/TPeterW/Terrigenesis/wiki/Requests)
