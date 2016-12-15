@@ -2,12 +2,15 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
 	"strings"
+	"terrigenesis/fileserver/handlers"
 	"terrigenesis/fileserver/utils"
+	"time"
 )
 
 var sessions []utils.Session
@@ -19,59 +22,68 @@ func StartServer() {
 	handleInterrupt()
 
 	// initialize session list
-	// sessions := make([]utils.Session, 0)
+	sessions := make([]utils.Session, 0)
+	fmt.Printf("Current sessions %v\n", sessions)
 
 	// port number
 	portNum := 3000
 
 	fmt.Println("Listening on port " + strconv.Itoa(portNum))
 	http.HandleFunc("/", handler)
-	http.HandleFunc("/monkey", monkeyHandler)
 	http.ListenAndServe(":"+strconv.Itoa(portNum), nil)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		fmt.Println("Get request")
-	} else if r.Method == "POST" {
-		fmt.Println("Post request")
-	}
+	log.Println("\n", r)
+
 	splited := strings.Split(r.URL.Path[1:], "/")
-	request := splited[0]
 
-	switch request := splited[0]; request {
-	// Establish Connection
-	case "estabcon":
-	// Close Connection
-	case "closecon":
-	// Print Working Directory
-	case "pwd":
-	// Change Directory
-	case "chdir":
-	// Make Directory
-	case "mkdir":
-	// Remove Directory
-	case "rmdir":
-	// Upload File
-	case "upfile":
-	// Download File
-	case "downfile":
-	// Remove File
-	case "rmfile":
-	// Move File (does not support rename)
-	case "mvfile":
-	default:
-		// TODO: return error message
+	if r.Method == "GET" {
+		switch request := splited[0]; request {
+		// Close Connection
+		case "closecon":
+			fmt.Println(">>> Closing Connection")
+		// Print Working Directory
+		case "pwd":
+			fmt.Println(">>> Print Working Directory")
+		// Download File
+		case "downfile":
+			fmt.Println(">>> Download File")
+		default:
+			// TODO: return a snake game page
+		}
+	} else if r.Method == "POST" {
+		// TODO:
+		switch request := splited[0]; request {
+		// Establish Connection
+		case "estabcon":
+			fmt.Println(">>> Establish Connection")
+			if username, ok := handlers.EstablishConnection(w, r); ok {
+				sessions = append(sessions, utils.Session{Username: username, CWD: "./db", LastUsed: time.Now()})
+			}
+			fmt.Printf("Current session: %v\n", sessions)
+		// Change Directory
+		case "chdir":
+			fmt.Println(">>> Change Directory")
+		// Make Directory
+		case "mkdir":
+			fmt.Println(">>> Create Directory")
+		// Remove Directory
+		case "rmdir":
+			fmt.Println(">>> Remove Directory")
+		// Upload File
+		case "upfile":
+			fmt.Println(">>> Upload File")
+		// Remove File
+		case "rmfile":
+			fmt.Println(">>> Remove File")
+		// Move File (does not support rename)
+		case "mvfile":
+			fmt.Println(">>> Move File")
+		default:
+			// TODO: return an error message
+		}
 	}
-
-	filename := splited[1]
-
-	fmt.Println(request)
-	fmt.Println(filename)
-}
-
-func monkeyHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "This is a monkey")
 }
 
 func handleInterrupt() {
