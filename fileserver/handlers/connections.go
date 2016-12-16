@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"terrigenesis/fileserver/utils"
 
-	uuid "github.com/nu7hatch/gouuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 /*
@@ -16,16 +16,15 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 	var m utils.Message
 	w.Header().Set("Content-Type", "application/json")
 
-	var username string
-	var ok bool
-	if username, ok = utils.BasicAuth(r); ok {
+	var token uuid.UUID
+	if ok := utils.BasicAuth(r); ok {
 		fmt.Println(">>> Authentication Passed")
 		// compose header
 		w.WriteHeader(200)
 
 		// generate session token
-		token, err := uuid.NewV4()
-		m = utils.Message{Status: 200, Token: string(token[:])}
+		token := uuid.NewV4()
+		m = utils.Message{Status: 200, Token: token.String()}
 
 		// generate response in json
 		j, err := json.Marshal(m)
@@ -33,7 +32,7 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 			fmt.Println("ERR ", err)
 		} else {
 			w.Write(j)
-			return username, true
+			return token.String(), true
 		}
 	} else {
 		fmt.Println(">>> Cannot authenticate user")
@@ -47,5 +46,5 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 		}
 	}
 
-	return username, false
+	return token.String(), false
 }
