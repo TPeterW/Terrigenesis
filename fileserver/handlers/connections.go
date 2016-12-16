@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"terrigenesis/fileserver/utils"
+
+	uuid "github.com/nu7hatch/gouuid"
 )
 
 /*
@@ -20,7 +22,12 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 		fmt.Println(">>> Authentication Passed")
 		// compose header
 		w.WriteHeader(200)
-		m = utils.Message{Status: 200, Message: "ok"}
+
+		// generate session token
+		token, err := uuid.NewV4()
+		m = utils.Message{Status: 200, Token: string(token[:])}
+
+		// generate response in json
 		j, err := json.Marshal(m)
 		if err != nil {
 			fmt.Println("ERR ", err)

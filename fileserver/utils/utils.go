@@ -19,4 +19,5 @@ Message Response format from server to client
 type Message struct {
 	Status  int
 	Message string
+	Token   string
 }
