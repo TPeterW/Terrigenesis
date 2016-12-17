@@ -8,7 +8,7 @@ import (
 Session representing an open session between client and server
 */
 type Session struct {
-	Username string    // username
+	Token    string    // token
 	CWD      string    // current working directory
 	LastUsed time.Time // last action time
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"terrigenesis/fileserver/utils"
 
 	uuid "github.com/satori/go.uuid"
@@ -13,7 +14,6 @@ import (
 EstablishConnection Handles connection establishment
 */
 func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) {
-	var m utils.Message
 	w.Header().Set("Content-Type", "application/json")
 
 	var token uuid.UUID
@@ -24,7 +24,7 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 
 		// generate session token
 		token := uuid.NewV4()
-		m = utils.Message{Status: 200, Token: token.String()}
+		m := utils.Message{Status: 200, Token: token.String()}
 
 		// generate response in json
 		j, err := json.Marshal(m)
@@ -35,16 +35,44 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 			return token.String(), true
 		}
 	} else {
-		fmt.Println(">>> Cannot authenticate user")
-		w.WriteHeader(401)
-		m = utils.Message{Status: 401, Message: "Authorization Error"}
+		AuthenticationError(w)
+	}
+
+	return token.String(), false
+}
+
+/*
+CloseConnection Handles connection terminalization
+*/
+func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Session) {
+	w.Header().Set("Content-Type", "application/json")
+
+	if ok := utils.BasicAuth(r); ok {
+		fmt.Println(">>> Authentication Passed")
+
+		m := utils.Message{Status: 200, Message: "Session not found"}
+		w.WriteHeader(404)
+
+		for i := 0; i < len(sessions); i++ {
+			if sessions[i].Token == strings.Join(r.URL.Query()["token"], "") {
+				removeFromSlice(sessions, i)
+				m = utils.Message{Status: 200, Message: "Successfully closed session"}
+				w.WriteHeader(200)
+			}
+		}
+
 		j, err := json.Marshal(m)
 		if err != nil {
 			fmt.Println("ERR ", err)
 		} else {
 			w.Write(j)
 		}
+	} else {
+		AuthenticationError(w)
 	}
+}
 
-	return token.String(), false
+func removeFromSlice(s []utils.Session, i int) []utils.Session {
+	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	return s[:len(s)-1]
 }

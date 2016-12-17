@@ -43,12 +43,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		// Close Connection
 		case "closecon":
 			fmt.Println(">>> Closing Connection")
+			handlers.CloseConnection(w, r, sessions)
+			fmt.Printf("Current sessions: %v\n", sessions)
+
 		// Print Working Directory
 		case "pwd":
 			fmt.Println(">>> Print Working Directory")
+
 		// Download File
 		case "downfile":
 			fmt.Println(">>> Download File")
+
 		default:
 			// TODO: return a snake game page
 		}
@@ -58,28 +63,35 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		// Establish Connection
 		case "estabcon":
 			fmt.Println(">>> Establish Connection")
-			if username, ok := handlers.EstablishConnection(w, r); ok {
-				sessions = append(sessions, utils.Session{Username: username, CWD: "./db", LastUsed: time.Now()})
+			if token, ok := handlers.EstablishConnection(w, r); ok {
+				sessions = append(sessions, utils.Session{Token: token, CWD: "./db", LastUsed: time.Now()})
 			}
-			fmt.Printf("Current session: %v\n", sessions)
+			fmt.Printf("Current sessions: %v\n", sessions)
+
 		// Change Directory
 		case "chdir":
 			fmt.Println(">>> Change Directory")
+
 		// Make Directory
 		case "mkdir":
 			fmt.Println(">>> Create Directory")
+
 		// Remove Directory
 		case "rmdir":
 			fmt.Println(">>> Remove Directory")
+
 		// Upload File
 		case "upfile":
 			fmt.Println(">>> Upload File")
+
 		// Remove File
 		case "rmfile":
 			fmt.Println(">>> Remove File")
+
 		// Move File (does not support rename)
 		case "mvfile":
 			fmt.Println(">>> Move File")
+
 		default:
 			// TODO: return an error message
 		}
