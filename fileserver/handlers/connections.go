@@ -27,17 +27,11 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 		m := utils.Message{Status: 200, Token: token.String()}
 
 		// generate response in json
-		j, err := json.Marshal(m)
-		if err != nil {
-			fmt.Println("ERR ", err)
-		} else {
-			w.Write(j)
-			return token.String(), true
-		}
-	} else {
-		AuthenticationError(w)
+		json.NewEncoder(w).Encode(m)
+		return token.String(), true
 	}
 
+	AuthenticationError(w)
 	return token.String(), false
 }
 
@@ -61,12 +55,7 @@ func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Se
 			}
 		}
 
-		j, err := json.Marshal(m)
-		if err != nil {
-			fmt.Println("ERR ", err)
-		} else {
-			w.Write(j)
-		}
+		json.NewEncoder(w).Encode(m)
 	} else {
 		AuthenticationError(w)
 	}
