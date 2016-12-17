@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -66,15 +67,23 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions []utils.Session) []utils.Session {
-	if r.URL.Query()["token"] == nil {
+	if r.URL.Query()["Token"] == nil {
 		handlers.IllegalArgumentsError(w)
 		return sessions
 	}
+	var session utils.Session
+	var exists bool
+	if session, exists = utils.SessionExist(sessions, strings.Join(r.URL.Query()["Token"], "")); !exists {
+		handlers.SessionNotFoundError(w)
+		return sessions
+	}
 
+	// now session is available for use
 	switch request {
 	// Print Working Directory
 	case "pwd":
 		fmt.Println(">>> Print Working Directory")
+		handlers.PrintWorkingDirectory(w, r, session)
 
 	// Download File
 	case "downfile":
@@ -83,12 +92,27 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 	default:
 		// TODO: render a snake game
 	}
+
+	// TODO: replace original session with current one
+
 	return sessions
 }
 
 func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions []utils.Session) []utils.Session {
-	// decoder := json.NewDecoder(r.Body)
-	// TODO:
+	defer r.Body.Close()
+
+	var body utils.PostBody
+	err := json.NewDecoder(r.Body).Decode(&body)
+	if err != nil {
+		handlers.IllegalArgumentsError(w)
+		return sessions
+	}
+	var session utils.Session
+	var exists bool
+	if session, exists = utils.SessionExist(sessions, body.Token); !exists {
+		handlers.SessionNotFoundError(w)
+		return sessions
+	}
 
 	switch request {
 	// Change Directory
@@ -106,6 +130,7 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	// Upload File
 	case "upfile":
 		fmt.Println(">>> Upload File")
+		handlers.UploadFile(w, r, session)
 
 	// Remove File
 	case "rmfile":
@@ -118,6 +143,9 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	default:
 		// TODO: render a snake game
 	}
+
+	// TODO: replace original session with current one
+
 	return sessions
 }
 

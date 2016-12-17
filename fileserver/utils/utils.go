@@ -3,7 +3,7 @@ package utils
 import "time"
 
 /*
-Session Representing an open session between client and server
+Session An open session between client and server
 */
 type Session struct {
 	Token    string    // token
@@ -21,13 +21,20 @@ type Message struct {
 }
 
 /*
+PostBody Format for body of post request
+*/
+type PostBody struct {
+	Token string // session token
+}
+
+/*
 SessionExist Check if a token is for one of the existinng sessions
 */
-func SessionExist(sessions []Session, token string) bool {
+func SessionExist(sessions []Session, token string) (Session, bool) {
 	for _, session := range sessions {
 		if session.Token == token {
-			return true
+			return session, true
 		}
 	}
-	return false
+	return Session{}, false // return empty session not to be used
 }

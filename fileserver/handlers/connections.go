@@ -48,7 +48,7 @@ func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Se
 		w.WriteHeader(404)
 
 		for i := 0; i < len(sessions); i++ {
-			if sessions[i].Token == strings.Join(r.URL.Query()["token"], "") {
+			if sessions[i].Token == strings.Join(r.URL.Query()["Token"], "") {
 				sessions = removeFromSlice(sessions, i)
 				m = utils.Message{Status: 200, Message: "Successfully closed session"}
 				w.WriteHeader(200)
