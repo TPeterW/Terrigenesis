@@ -23,12 +23,12 @@ func StartServer() {
 
 	// initialize session list
 	sessions := make([]utils.Session, 0)
-	fmt.Printf("Current sessions %v\n", sessions)
 
 	// port number
 	portNum := 3000
 
 	fmt.Println("Listening on port " + strconv.Itoa(portNum))
+	fmt.Printf("Current sessions %v\n", sessions)
 	http.HandleFunc("/", handler)
 	http.ListenAndServe(":"+strconv.Itoa(portNum), nil)
 }
@@ -43,8 +43,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		// Close Connection
 		case "closecon":
 			fmt.Println(">>> Closing Connection")
-			handlers.CloseConnection(w, r, sessions)
-			fmt.Printf("Current sessions: %v\n", sessions)
+			sessions = handlers.CloseConnection(w, r, sessions)
+			fmt.Printf("Current sessions: %v\n\n", sessions)
 
 		// Print Working Directory
 		case "pwd":
@@ -66,7 +66,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			if token, ok := handlers.EstablishConnection(w, r); ok {
 				sessions = append(sessions, utils.Session{Token: token, CWD: "./db", LastUsed: time.Now()})
 			}
-			fmt.Printf("Current sessions: %v\n", sessions)
+			fmt.Printf("Current sessions: %v\n\n", sessions)
 
 		// Change Directory
 		case "chdir":

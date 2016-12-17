@@ -44,7 +44,7 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 /*
 CloseConnection Handles connection terminalization
 */
-func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Session) {
+func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Session) []utils.Session {
 	w.Header().Set("Content-Type", "application/json")
 
 	if ok := utils.BasicAuth(r); ok {
@@ -55,7 +55,7 @@ func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Se
 
 		for i := 0; i < len(sessions); i++ {
 			if sessions[i].Token == strings.Join(r.URL.Query()["token"], "") {
-				removeFromSlice(sessions, i)
+				sessions = removeFromSlice(sessions, i)
 				m = utils.Message{Status: 200, Message: "Successfully closed session"}
 				w.WriteHeader(200)
 			}
@@ -70,6 +70,8 @@ func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Se
 	} else {
 		AuthenticationError(w)
 	}
+
+	return sessions
 }
 
 func removeFromSlice(s []utils.Session, i int) []utils.Session {
