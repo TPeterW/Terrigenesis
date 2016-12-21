@@ -17,22 +17,17 @@ func EstablishConnection(w http.ResponseWriter, r *http.Request) (string, bool) 
 	w.Header().Set("Content-Type", "application/json")
 
 	var token uuid.UUID
-	if ok := utils.BasicAuth(r); ok {
-		fmt.Println(">>> Authentication Passed")
-		// compose header
-		w.WriteHeader(200)
+	fmt.Println(">>> Authentication Passed")
+	// compose header
+	w.WriteHeader(200)
 
-		// generate session token
-		token := uuid.NewV4()
-		m := utils.Message{Status: 200, Token: token.String()}
+	// generate session token
+	token = uuid.NewV4()
+	m := utils.Response{Status: 200, Token: token.String()}
 
-		// generate response in json
-		json.NewEncoder(w).Encode(m)
-		return token.String(), true
-	}
-
-	AuthenticationError(w)
-	return token.String(), false
+	// generate response in json
+	err := json.NewEncoder(w).Encode(m)
+	return token.String(), err == nil
 }
 
 /*
@@ -41,24 +36,20 @@ CloseConnection Handles connection terminalization
 func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Session) []utils.Session {
 	w.Header().Set("Content-Type", "application/json")
 
-	if ok := utils.BasicAuth(r); ok {
-		fmt.Println(">>> Authentication Passed")
+	fmt.Println(">>> Authentication Passed")
 
-		m := utils.Message{Status: 200, Message: "Session not found"}
-		w.WriteHeader(404)
+	m := utils.Response{Status: 200, Message: "Session not found"}
+	w.WriteHeader(404)
 
-		for i := 0; i < len(sessions); i++ {
-			if sessions[i].Token == strings.Join(r.URL.Query()["Token"], "") {
-				sessions = removeFromSlice(sessions, i)
-				m = utils.Message{Status: 200, Message: "Successfully closed session"}
-				w.WriteHeader(200)
-			}
+	for i := 0; i < len(sessions); i++ {
+		if sessions[i].Token == strings.Join(r.URL.Query()["Token"], "") {
+			sessions = removeFromSlice(sessions, i)
+			m = utils.Response{Status: 200, Message: "Successfully closed session"}
+			w.WriteHeader(200)
 		}
-
-		json.NewEncoder(w).Encode(m)
-	} else {
-		AuthenticationError(w)
 	}
+
+	json.NewEncoder(w).Encode(m)
 
 	return sessions
 }

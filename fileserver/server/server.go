@@ -43,6 +43,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// basic authentication
+	if ok := utils.BasicAuth(r); ok {
+		fmt.Println(">>> Authentication Passed")
+	} else {
+		handlers.AuthenticationError(w)
+		return
+	}
+
 	splited := strings.Split(r.URL.Path[1:], "/")
 
 	if r.Method == "GET" {
@@ -101,7 +109,7 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 		renderSnake(w)
 	}
 
-	// TODO: replace original session with current one
+	// none of the actions will modify the session
 
 	return sessions
 }

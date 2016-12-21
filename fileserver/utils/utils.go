@@ -12,12 +12,13 @@ type Session struct {
 }
 
 /*
-Message Response format from server to client
+Response Response format from server to client
 */
-type Message struct {
+type Response struct {
 	Status  int
 	Message string
 	Token   string
+	CWD     string
 }
 
 /*
