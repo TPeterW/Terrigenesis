@@ -8,7 +8,7 @@ import (
 
 func main() {
 	if len(os.Args) <= 1 {
-		fmt.Println("Usage: ")
+		fmt.Println("Usage: username")
 	} else {
 		client.StartClient(os.Args[1:])
 	}
