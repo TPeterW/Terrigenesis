@@ -1,6 +1,9 @@
 # OSX
 .DS_Store
 
+# File directory
+db/
+
 # Encrption
 secrets/
 
