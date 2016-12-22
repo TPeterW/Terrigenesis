@@ -109,6 +109,7 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 	// Download File
 	case "downfile":
 		fmt.Println(">>> Download File")
+		handlers.DownloadFile(w, r, session)
 
 	default:
 		handlers.UnknownCommandError(w)

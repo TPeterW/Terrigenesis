@@ -10,7 +10,9 @@ package handlers
 // }
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 	"terrigenesis/fileserver/utils"
 )
 
@@ -18,8 +20,16 @@ import (
 DownloadFile Handles requests to download a file
 */
 func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session) bool {
+	fmt.Println(">>> Download file")
+	var fileName []string
+	if fileName = r.URL.Query()["filename"]; fileName == nil {
+		IllegalArgumentsError(w)
+		return false
+	}
+
 	// TODO:
 
+	http.ServeFile(w, r, session.CWD+"/"+strings.Join(fileName, ""))
 	return true
 }
 
