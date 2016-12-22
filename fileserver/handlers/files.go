@@ -12,6 +12,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"terrigenesis/fileserver/utils"
 )
@@ -27,10 +28,22 @@ func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session)
 		return false
 	}
 
-	// TODO:
+	pathToFile := session.CWD + "/" + strings.Join(fileName, "")
+	var entry os.FileInfo
+	var err error
+	if entry, err = os.Stat(pathToFile); err == nil {
+		// entry exists
+		if !entry.IsDir() {
+			// is not directory
+			http.ServeFile(w, r, pathToFile)
+			return true
+		}
+		FileTypeError(w)
+		return false
+	}
 
-	http.ServeFile(w, r, session.CWD+"/"+strings.Join(fileName, ""))
-	return true
+	FileNotFoundError(w)
+	return false
 }
 
 /*

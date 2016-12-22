@@ -31,7 +31,7 @@ func SessionNotFoundError(w http.ResponseWriter) {
 IllegalArgumentsError Handles all bad requests
 */
 func IllegalArgumentsError(w http.ResponseWriter) {
-	fmt.Println(">>> Illegal Arguments")
+	fmt.Println(">>> Illegal arguments")
 	w.WriteHeader(400)
 	m := utils.Response{Status: 400, Message: "Bad request, possibily missing arguments"}
 	json.NewEncoder(w).Encode(m)
@@ -41,8 +41,28 @@ func IllegalArgumentsError(w http.ResponseWriter) {
 UnknownCommandError Handles all unknown commands
 */
 func UnknownCommandError(w http.ResponseWriter) {
-	fmt.Println(">>> Unknown Commands")
+	fmt.Println(">>> Unknown commands")
 	w.WriteHeader(406)
 	m := utils.Response{Status: 406, Message: "Unknown command"}
+	json.NewEncoder(w).Encode(m)
+}
+
+/*
+FileNotFoundError Hanldes all file not found error
+*/
+func FileNotFoundError(w http.ResponseWriter) {
+	fmt.Println(">>> File not found")
+	w.WriteHeader(500)
+	m := utils.Response{Status: 500, Message: "File not found"}
+	json.NewEncoder(w).Encode(m)
+}
+
+/*
+FileTypeError Handles all file type error
+*/
+func FileTypeError(w http.ResponseWriter) {
+	fmt.Println(">>> File type error")
+	w.WriteHeader(500)
+	m := utils.Response{Status: 500, Message: "File type error, mistaking file for dir or V/V"}
 	json.NewEncoder(w).Encode(m)
 }
