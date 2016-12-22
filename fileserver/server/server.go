@@ -30,11 +30,11 @@ func StartServer() {
 
 	fmt.Println("Listening on port " + strconv.Itoa(portNum))
 	fmt.Printf("Current sessions %v\n", sessions)
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/", mainHandler)
 	http.ListenAndServe(":"+strconv.Itoa(portNum), nil)
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func mainHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("\n", r)
 
 	// root page, render snakey
@@ -101,12 +101,16 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 		fmt.Println(">>> Print Working Directory")
 		handlers.PrintWorkingDirectory(w, r, session)
 
+	// List all files under current directory
+	case "dir":
+		fmt.Println(">>> List Files")
+
 	// Download File
 	case "downfile":
 		fmt.Println(">>> Download File")
 
 	default:
-		renderSnake(w)
+		handlers.UnknownCommandError(w)
 	}
 
 	// none of the actions will modify the session
@@ -157,7 +161,7 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 		fmt.Println(">>> Move File")
 
 	default:
-		renderSnake(w)
+		handlers.UnknownCommandError(w)
 	}
 
 	// TODO: replace original session with current one

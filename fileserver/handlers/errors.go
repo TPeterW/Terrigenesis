@@ -36,3 +36,13 @@ func IllegalArgumentsError(w http.ResponseWriter) {
 	m := utils.Response{Status: 400, Message: "Bad request, possibily missing arguments"}
 	json.NewEncoder(w).Encode(m)
 }
+
+/*
+UnknownCommandError Handles all unknown commands
+*/
+func UnknownCommandError(w http.ResponseWriter) {
+	fmt.Println(">>> Unknown Commands")
+	w.WriteHeader(406)
+	m := utils.Response{Status: 406, Message: "Unknown command"}
+	json.NewEncoder(w).Encode(m)
+}
