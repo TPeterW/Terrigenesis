@@ -1,10 +1,21 @@
 package handlers
 
-import "net/http"
-import "terrigenesis/fileserver/utils"
-import "encoding/json"
-import "io/ioutil"
-import "log"
+// type FileInfo interface {
+//         Name() string       // base name of the file
+//         Size() int64        // length in bytes for regular files; system-dependent for others
+//         Mode() FileMode     // file mode bits
+//         ModTime() time.Time // modification time
+//         IsDir() bool        // abbreviation for Mode().IsDir()
+//         Sys() interface{}   // underlying data source (can return nil)
+// }
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"terrigenesis/fileserver/utils"
+)
 
 /*
 PrintWorkingDirectory Returns current working directory
