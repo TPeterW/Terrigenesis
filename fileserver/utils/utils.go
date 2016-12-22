@@ -15,10 +15,11 @@ type Session struct {
 Response Response format from server to client
 */
 type Response struct {
-	Status  int
-	Message string
-	Token   string
-	CWD     string
+	Status   int
+	Message  string
+	Token    string
+	CWD      string
+	DirFiles []string
 }
 
 /*

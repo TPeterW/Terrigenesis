@@ -104,6 +104,7 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 	// List all files under current directory
 	case "dir":
 		fmt.Println(">>> List Files")
+		handlers.ListFiles(w, r, session)
 
 	// Download File
 	case "downfile":
@@ -115,6 +116,7 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 
 	// none of the actions will modify the session
 
+	fmt.Printf("\n")
 	return sessions
 }
 
@@ -166,6 +168,7 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 
 	// TODO: replace original session with current one
 
+	fmt.Printf("\n")
 	return sessions
 }
 
