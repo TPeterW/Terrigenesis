@@ -111,6 +111,7 @@ func ChangeDir(w http.ResponseWriter, r *http.Request, form url.Values, session 
 	}
 
 	session.CWD = strings.TrimRight(strings.Join(curSplited, "/"), "/")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	m := utils.Response{Status: 200, CWD: session.CWD}
 	json.NewEncoder(w).Encode(m)
@@ -135,6 +136,8 @@ func MakeDir(w http.ResponseWriter, r *http.Request, form url.Values, session ut
 		}
 	}
 	os.Mkdir(pathToDir, os.ModeDir)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
 	m := utils.Response{Status: 200, Message: "Successfully created directory: " + strings.Join(form["dirname"], "")}
 	json.NewEncoder(w).Encode(m)
 }
@@ -158,6 +161,7 @@ func RemoveDir(w http.ResponseWriter, r *http.Request, form url.Values, session 
 			if removeErr := os.Remove(pathToDir); removeErr != nil {
 				GeneralError(w, 500, "Error removing directory")
 			} else {
+				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(200)
 				m := utils.Response{Status: 200, Message: "Successfully removed directory"}
 				json.NewEncoder(w).Encode(m)

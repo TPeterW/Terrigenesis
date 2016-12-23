@@ -58,6 +58,8 @@ func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
 			GeneralError(w, 500, "Error writing file")
 		} else {
 			io.Copy(f, file)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(200)
 			m := utils.Response{Status: 200, Message: "Successfully uploaded file: " + handler.Filename}
 			json.NewEncoder(w).Encode(m)
 		}
@@ -83,6 +85,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 			if removeErr := os.Remove(pathToFile); removeErr != nil {
 				GeneralError(w, 500, "Error removing file")
 			} else {
+				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(200)
 				m := utils.Response{Status: 200, Message: "Successfully removed file"}
 				json.NewEncoder(w).Encode(m)
@@ -137,6 +140,8 @@ func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, sessio
 	}
 	destination := strings.Join(pointerSplited, "/") + "/" + strings.Join(form["origin"], "")
 	if err := os.Rename(origin, destination); err == nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
 		m := utils.Response{Status: 200, Message: "Successfully moved file/directory"}
 		json.NewEncoder(w).Encode(m)
 	} else {
