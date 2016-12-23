@@ -11,6 +11,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -46,8 +47,21 @@ func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session)
 UploadFile Handles requests to upload file
 */
 func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
-	// TODO:
-
+	file, handler, err := r.FormFile("file")
+	defer file.Close()
+	if err != nil {
+		GeneralError(w, 500, "Error parsing file")
+	} else {
+		f, err := os.OpenFile(session.CWD+"/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		defer f.Close()
+		if err != nil {
+			GeneralError(w, 500, "Error writing file")
+		} else {
+			io.Copy(f, file)
+			m := utils.Response{Status: 200, Message: "Successfully uploaded file: " + handler.Filename}
+			json.NewEncoder(w).Encode(m)
+		}
+	}
 }
 
 /*
