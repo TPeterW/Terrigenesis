@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"terrigenesis/fileserver/utils"
@@ -67,9 +68,14 @@ func ListFiles(w http.ResponseWriter, r *http.Request, session utils.Session) {
 /*
 ChangeDir Changes to a certain directory (direct parent or child)
 */
-func ChangeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) utils.Session {
+func ChangeDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) utils.Session {
+	if form["dirname"] == nil {
+		IllegalArgumentsError(w)
+		return session
+	}
+
 	curSplited := strings.Split(session.CWD, "/")
-	destSplited := strings.Split(body.Dirname, "/")
+	destSplited := strings.Split(strings.Join(form["dirname"], ""), "/")
 
 	for _, dest := range destSplited {
 		if strings.Compare(dest, ".") == 0 {
@@ -115,8 +121,13 @@ func ChangeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, sess
 /*
 MakeDir Creates a specific directory
 */
-func MakeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) {
-	pathToDir := session.CWD + "/" + body.Dirname
+func MakeDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+	if form["dirname"] == nil {
+		IllegalArgumentsError(w)
+		return
+	}
+
+	pathToDir := session.CWD + "/" + strings.Join(form["dirname"], "")
 	if entry, err := os.Stat(pathToDir); err == nil {
 		if entry.IsDir() {
 			FileExistError(w)
@@ -124,15 +135,20 @@ func MakeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, sessio
 		}
 	}
 	os.Mkdir(pathToDir, os.ModeDir)
-	m := utils.Response{Status: 200, Message: "Successfully created directory: " + body.Dirname}
+	m := utils.Response{Status: 200, Message: "Successfully created directory: " + strings.Join(form["dirname"], "")}
 	json.NewEncoder(w).Encode(m)
 }
 
 /*
 RemoveDir Removes a specific directory
 */
-func RemoveDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) {
-	pathToDir := session.CWD + "/" + body.Dirname
+func RemoveDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+	if form["dirname"] == nil {
+		IllegalArgumentsError(w)
+		return
+	}
+
+	pathToDir := session.CWD + "/" + strings.Join(form["dirname"], "")
 	var entry os.FileInfo
 	var err error
 	if entry, err = os.Stat(pathToDir); err == nil {
@@ -143,7 +159,7 @@ func RemoveDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, sess
 				GeneralError(w, 500, "Error removing directory")
 			} else {
 				w.WriteHeader(200)
-				m := utils.Response{Status: 200}
+				m := utils.Response{Status: 200, Message: "Successfully removed directory"}
 				json.NewEncoder(w).Encode(m)
 			}
 		} else {

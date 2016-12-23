@@ -30,6 +30,7 @@ type PostBody struct {
 	Filename string // filename to move or delete
 	Dirname  string // dirname to move or delete
 	Dest     string // destination of moving
+	File     string // file to upload
 }
 
 /*

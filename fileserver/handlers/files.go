@@ -12,6 +12,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"terrigenesis/fileserver/utils"
@@ -46,13 +47,19 @@ UploadFile Handles requests to upload file
 */
 func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
 	// TODO:
+
 }
 
 /*
 RemoveFile Handles requests to remove file
 */
-func RemoveFile(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) {
-	pathToFile := session.CWD + "/" + body.Filename
+func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+	if form["filename"] == nil {
+		IllegalArgumentsError(w)
+		return
+	}
+
+	pathToFile := session.CWD + "/" + strings.Join(form["filename"], "")
 	var entry os.FileInfo
 	var err error
 	if entry, err = os.Stat(pathToFile); err == nil {
@@ -63,7 +70,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, body utils.PostBody, ses
 				GeneralError(w, 500, "Error removing file")
 			} else {
 				w.WriteHeader(200)
-				m := utils.Response{Status: 200}
+				m := utils.Response{Status: 200, Message: "Successfully removed file"}
 				json.NewEncoder(w).Encode(m)
 			}
 		} else {

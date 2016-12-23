@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -124,16 +123,17 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions []utils.Session) []utils.Session {
 	defer r.Body.Close()
 
-	var body utils.PostBody
-	err := json.NewDecoder(r.Body).Decode(&body)
+	err := r.ParseMultipartForm(32 >> 20)
 	if err != nil {
 		handlers.IllegalArgumentsError(w)
 		return sessions
 	}
+	token := strings.Join(r.Form["token"], "")
+
 	var session utils.Session
 	var index int
 	var exists bool
-	if session, index, exists = utils.SessionExist(sessions, body.Token); !exists {
+	if session, index, exists = utils.SessionExist(sessions, token); !exists {
 		handlers.SessionNotFoundError(w)
 		return sessions
 	}
@@ -142,19 +142,19 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	// Change Directory
 	case "chdir":
 		fmt.Println(">>> Change Directory")
-		session = handlers.ChangeDir(w, r, body, session)
+		session = handlers.ChangeDir(w, r, r.Form, session)
 		sessions = utils.RemoveFromSlice(sessions, index)
 		sessions = append(sessions, session)
 
 	// Make Directory
 	case "mkdir":
 		fmt.Println(">>> Create Directory")
-		handlers.MakeDir(w, r, body, session)
+		handlers.MakeDir(w, r, r.Form, session)
 
 	// Remove Directory
 	case "rmdir":
 		fmt.Println(">>> Remove Directory")
-		handlers.RemoveDir(w, r, body, session)
+		handlers.RemoveDir(w, r, r.Form, session)
 
 	// Upload File
 	case "upfile":
@@ -164,7 +164,7 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	// Remove File
 	case "rmfile":
 		fmt.Println(">>> Remove File")
-		handlers.RemoveFile(w, r, body, session)
+		handlers.RemoveFile(w, r, r.Form, session)
 
 	// Move File (does not support rename)
 	case "mvfile":
