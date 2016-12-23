@@ -158,6 +158,7 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	// Remove File
 	case "rmfile":
 		fmt.Println(">>> Remove File")
+		handlers.RemoveFile(w, r, body, session)
 
 	// Move File (does not support rename)
 	case "mvfile":

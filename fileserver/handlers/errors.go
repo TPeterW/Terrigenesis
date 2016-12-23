@@ -66,3 +66,13 @@ func FileTypeError(w http.ResponseWriter) {
 	m := utils.Response{Status: 500, Message: "File type error, mistaking file for dir or V/V"}
 	json.NewEncoder(w).Encode(m)
 }
+
+/*
+GeneralError Handles general type error
+*/
+func GeneralError(w http.ResponseWriter, statusCode int, message string) {
+	fmt.Printf("General error, %s\n", message)
+	w.WriteHeader(statusCode)
+	m := utils.Response{Status: statusCode, Message: message}
+	json.NewEncoder(w).Encode(m)
+}
