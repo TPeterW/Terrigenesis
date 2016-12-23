@@ -20,11 +20,10 @@ import (
 /*
 DownloadFile Handles requests to download a file
 */
-func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session) bool {
+func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
 	var fileName []string
 	if fileName = r.URL.Query()["filename"]; fileName == nil {
 		IllegalArgumentsError(w)
-		return false
 	}
 
 	pathToFile := session.CWD + "/" + strings.Join(fileName, "")
@@ -35,24 +34,18 @@ func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session)
 		if !entry.IsDir() {
 			// is not directory
 			http.ServeFile(w, r, pathToFile)
-			return true
 		}
 		FileTypeError(w)
-		return false
 	}
 
 	FileNotFoundError(w)
-	return false
-	// return value is currently unused
 }
 
 /*
 UploadFile Handles requests to upload file
 */
-func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) bool {
+func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
 	// TODO:
-
-	return true
 }
 
 /*
