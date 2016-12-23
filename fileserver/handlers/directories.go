@@ -11,10 +11,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"terrigenesis/fileserver/utils"
 )
 
@@ -64,7 +66,56 @@ func ListFiles(w http.ResponseWriter, r *http.Request, session utils.Session) {
 }
 
 /*
-RemoveDir Handles requests to remove file
+ChangeDir Changes to a certain directory (direct parent or child)
+*/
+func ChangeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) utils.Session {
+	curSplited := strings.Split(session.CWD, "/")
+	destSplited := strings.Split(body.Dirname, "/")
+
+	for _, dest := range destSplited {
+		if strings.Compare(dest, ".") == 0 {
+			continue
+		} else if strings.Compare(dest, "..") == 0 {
+			// up one level
+			curDir := strings.Join(curSplited, "/")
+			if strings.Compare(curDir, "./db") != 0 && strings.Compare(curDir, "./db/") != 0 {
+				// when not top level
+				curSplited = curSplited[:len(curSplited)-1]
+			} else {
+				FolderPermissionError(w)
+				return session
+			}
+		} else {
+			// down one level
+			pathToNewDir := strings.Join(curSplited, "/") + "/" + dest
+			if entry, err := os.Stat(pathToNewDir); err == nil {
+				// dir exists
+				if !entry.IsDir() {
+					// not a directory
+					FileTypeError(w)
+					return session
+				}
+				// is actually a directory
+				curSplited = append(curSplited, dest)
+			} else {
+				// dir doesn't exist
+				fmt.Println(dest)
+				FileNotFoundError(w)
+				return session
+			}
+		}
+	}
+
+	session.CWD = strings.TrimRight(strings.Join(curSplited, "/"), "/")
+	w.WriteHeader(200)
+	m := utils.Response{Status: 200, CWD: session.CWD}
+	json.NewEncoder(w).Encode(m)
+
+	return session
+}
+
+/*
+RemoveDir Removes a specific directory
 */
 func RemoveDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) {
 	pathToDir := session.CWD + "/" + body.Dirname

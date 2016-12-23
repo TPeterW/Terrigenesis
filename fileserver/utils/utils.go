@@ -35,11 +35,19 @@ type PostBody struct {
 /*
 SessionExist Check if a token is for one of the existinng sessions
 */
-func SessionExist(sessions []Session, token string) (Session, bool) {
-	for _, session := range sessions {
+func SessionExist(sessions []Session, token string) (Session, int, bool) {
+	for index, session := range sessions {
 		if session.Token == token {
-			return session, true
+			return session, index, true
 		}
 	}
-	return Session{}, false // return empty session not to be used
+	return Session{}, -1, false // return empty session not to be used
+}
+
+/*
+RemoveFromSlice Remove a session from a slice
+*/
+func RemoveFromSlice(s []Session, i int) []Session {
+	s[len(s)-1], s[i] = s[i], s[len(s)-1]
+	return s[:len(s)-1]
 }

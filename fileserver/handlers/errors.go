@@ -68,6 +68,16 @@ func FileTypeError(w http.ResponseWriter) {
 }
 
 /*
+FolderPermissionError Handles cases where user tries to access outside "./db"
+*/
+func FolderPermissionError(w http.ResponseWriter) {
+	fmt.Println(">>> Folder permission error")
+	w.WriteHeader(401)
+	m := utils.Response{Status: 401, Message: "Cannot access outside database folder"}
+	json.NewEncoder(w).Encode(m)
+}
+
+/*
 GeneralError Handles general type error
 */
 func GeneralError(w http.ResponseWriter, statusCode int, message string) {

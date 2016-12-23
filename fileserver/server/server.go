@@ -89,7 +89,7 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 	}
 	var session utils.Session
 	var exists bool
-	if session, exists = utils.SessionExist(sessions, strings.Join(r.URL.Query()["Token"], "")); !exists {
+	if session, _, exists = utils.SessionExist(sessions, strings.Join(r.URL.Query()["Token"], "")); !exists {
 		handlers.SessionNotFoundError(w)
 		return sessions
 	}
@@ -131,8 +131,9 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 		return sessions
 	}
 	var session utils.Session
+	var index int
 	var exists bool
-	if session, exists = utils.SessionExist(sessions, body.Token); !exists {
+	if session, index, exists = utils.SessionExist(sessions, body.Token); !exists {
 		handlers.SessionNotFoundError(w)
 		return sessions
 	}
@@ -141,6 +142,9 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	// Change Directory
 	case "chdir":
 		fmt.Println(">>> Change Directory")
+		session = handlers.ChangeDir(w, r, body, session)
+		sessions = utils.RemoveFromSlice(sessions, index)
+		sessions = append(sessions, session)
 
 	// Make Directory
 	case "mkdir":
@@ -168,8 +172,6 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	default:
 		handlers.UnknownCommandError(w)
 	}
-
-	// TODO: replace original session with current one
 
 	fmt.Printf("\n")
 	return sessions
