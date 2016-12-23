@@ -113,6 +113,22 @@ func ChangeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, sess
 }
 
 /*
+MakeDir Creates a specific directory
+*/
+func MakeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) {
+	pathToDir := session.CWD + "/" + body.Dirname
+	if entry, err := os.Stat(pathToDir); err == nil {
+		if entry.IsDir() {
+			FileExistError(w)
+			return
+		}
+	}
+	os.Mkdir(pathToDir, os.ModeDir)
+	m := utils.Response{Status: 200, Message: "Successfully created directory: " + body.Dirname}
+	json.NewEncoder(w).Encode(m)
+}
+
+/*
 RemoveDir Removes a specific directory
 */
 func RemoveDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) {

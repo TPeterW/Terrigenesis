@@ -149,6 +149,7 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	// Make Directory
 	case "mkdir":
 		fmt.Println(">>> Create Directory")
+		handlers.MakeDir(w, r, body, session)
 
 	// Remove Directory
 	case "rmdir":

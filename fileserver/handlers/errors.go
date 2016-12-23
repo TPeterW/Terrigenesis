@@ -78,6 +78,16 @@ func FolderPermissionError(w http.ResponseWriter) {
 }
 
 /*
+FileExistError Hanles cases where file or directory already exists
+*/
+func FileExistError(w http.ResponseWriter) {
+	fmt.Println(">>> Already exists")
+	w.WriteHeader(409)
+	m := utils.Response{Status: 401, Message: "File or directory already exists"}
+	json.NewEncoder(w).Encode(m)
+}
+
+/*
 GeneralError Handles general type error
 */
 func GeneralError(w http.ResponseWriter, statusCode int, message string) {
