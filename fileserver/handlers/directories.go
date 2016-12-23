@@ -11,7 +11,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -99,7 +98,6 @@ func ChangeDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, sess
 				curSplited = append(curSplited, dest)
 			} else {
 				// dir doesn't exist
-				fmt.Println(dest)
 				FileNotFoundError(w)
 				return session
 			}
