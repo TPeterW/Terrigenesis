@@ -95,3 +95,51 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 		FileNotFoundError(w) // other options not very possible
 	}
 }
+
+/*
+MoveFileDir Moves a specific file to a specific location
+*/
+func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+	if form["origin"] == nil || form["destination"] == nil {
+		IllegalArgumentsError(w)
+		return
+	}
+
+	pointerSplited := strings.Split(session.CWD, "/")
+	origin := session.CWD + "/" + strings.Join(form["origin"], "")
+	destSplited := strings.Split(strings.Join(form["destination"], ""), "/")
+
+	for _, dest := range destSplited {
+		if strings.Compare(dest, ".") == 0 {
+			continue
+		} else if strings.Compare(dest, "..") == 0 {
+			// up one level
+			curDir := strings.Join(pointerSplited, "")
+			if strings.Compare(curDir, "./db") != 0 && strings.Compare(curDir, "./db/") != 0 {
+				// when not top level
+				pointerSplited = pointerSplited[:len(pointerSplited)-1]
+			} else {
+				FolderPermissionError(w)
+				return
+			}
+		} else {
+			// down one level
+			path := strings.Join(pointerSplited, "/") + "/" + dest
+			if _, err := os.Stat(path); err == nil {
+				// entry exists
+				pointerSplited = append(pointerSplited, dest)
+			} else {
+				// entry doesn't exist
+				FileNotFoundError(w)
+				return
+			}
+		}
+	}
+	destination := strings.Join(pointerSplited, "/") + "/" + strings.Join(form["origin"], "")
+	if err := os.Rename(origin, destination); err == nil {
+		m := utils.Response{Status: 200, Message: "Successfully moved file/directory"}
+		json.NewEncoder(w).Encode(m)
+	} else {
+		GeneralError(w, 500, "Unable to move file/directory")
+	}
+}

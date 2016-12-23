@@ -167,8 +167,9 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 		handlers.RemoveFile(w, r, r.Form, session)
 
 	// Move File (does not support rename)
-	case "mvfile":
-		fmt.Println(">>> Move File")
+	case "mvfiledir":
+		fmt.Println(">>> Move File Or Dir")
+		handlers.MoveFileDir(w, r, r.Form, session)
 
 	default:
 		handlers.UnknownCommandError(w)
