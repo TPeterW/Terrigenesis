@@ -149,6 +149,7 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	// Remove Directory
 	case "rmdir":
 		fmt.Println(">>> Remove Directory")
+		handlers.RemoveDir(w, r, body, session)
 
 	// Upload File
 	case "upfile":

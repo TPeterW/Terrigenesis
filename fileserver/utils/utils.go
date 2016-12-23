@@ -28,6 +28,7 @@ PostBody Format for body of post request
 type PostBody struct {
 	Token    string // session token
 	Filename string // filename to move or delete
+	Dirname  string // dirname to move or delete
 	Dest     string // destination of moving
 }
 

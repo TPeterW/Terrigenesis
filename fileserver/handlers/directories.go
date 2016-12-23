@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"terrigenesis/fileserver/utils"
 )
 
@@ -60,4 +61,31 @@ func ListFiles(w http.ResponseWriter, r *http.Request, session utils.Session) {
 	}
 
 	json.NewEncoder(w).Encode(m)
+}
+
+/*
+RemoveDir Handles requests to remove file
+*/
+func RemoveDir(w http.ResponseWriter, r *http.Request, body utils.PostBody, session utils.Session) {
+	pathToDir := session.CWD + "/" + body.Dirname
+	var entry os.FileInfo
+	var err error
+	if entry, err = os.Stat(pathToDir); err == nil {
+		// entry exists
+		if entry.IsDir() {
+			// is actually a directory
+			if removeErr := os.Remove(pathToDir); removeErr != nil {
+				GeneralError(w, 500, "Error removing directory")
+			} else {
+				w.WriteHeader(200)
+				m := utils.Response{Status: 200}
+				json.NewEncoder(w).Encode(m)
+			}
+		} else {
+			// is not directory
+			GeneralError(w, 500, "Directory is a file")
+		}
+	} else {
+		FileNotFoundError(w) // other options not very possible
+	}
 }
