@@ -13,6 +13,9 @@ type delegate struct {
 	password string
 }
 
+/*
+openConnection Open connection
+*/
 func openConnection(del delegate) (delegate, bool) {
 	var target utils.Response
 	var ok bool
@@ -26,6 +29,9 @@ func openConnection(del delegate) (delegate, bool) {
 	return del, false
 }
 
+/*
+closeConnection Close connection
+*/
 func closeConnection(del delegate) bool {
 	var ok bool
 	query := url.Values{}
@@ -33,4 +39,19 @@ func closeConnection(del delegate) bool {
 
 	_, ok = makeGetRequest(10*time.Second, "/closecon", query, del)
 	return ok
+}
+
+/*
+printWorkingDirectory Print working directory
+*/
+func printWorkingDirectory(del delegate) {
+	var target utils.Response
+	var ok bool
+	query := url.Values{}
+	query.Add("Token", del.token)
+
+	target, ok = makeGetRequest(10*time.Second, "pwd", query, del)
+	if ok {
+		fmt.Printf(target.CWD + "\n>>> ")
+	}
 }

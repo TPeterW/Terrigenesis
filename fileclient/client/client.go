@@ -61,8 +61,8 @@ middleware Does different things depending on the request
 func middleware(cmd string, del delegate) {
 	// TODO:
 	switch cmd {
-	case "upfile":
-		// TODO:
+	case "pwd":
+		printWorkingDirectory(del)
 	// TODO:
 	default:
 		fmt.Printf("Unrecognized command\n>>> ")
