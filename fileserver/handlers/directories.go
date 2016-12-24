@@ -18,12 +18,15 @@ import (
 	"os"
 	"strings"
 	"terrigenesis/fileserver/utils"
+	"time"
 )
 
 /*
 PrintWorkingDirectory Returns current working directory
 */
-func PrintWorkingDirectory(w http.ResponseWriter, r *http.Request, session utils.Session) {
+func PrintWorkingDirectory(w http.ResponseWriter, r *http.Request, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	// compose header
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
@@ -33,12 +36,16 @@ func PrintWorkingDirectory(w http.ResponseWriter, r *http.Request, session utils
 
 	// convert response to json
 	json.NewEncoder(w).Encode(m)
+
+	return session
 }
 
 /*
 ListFiles Returns a list containing all files in current directory of the session
 */
-func ListFiles(w http.ResponseWriter, r *http.Request, session utils.Session) {
+func ListFiles(w http.ResponseWriter, r *http.Request, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	curDir := session.CWD
 
 	// compose header
@@ -63,12 +70,16 @@ func ListFiles(w http.ResponseWriter, r *http.Request, session utils.Session) {
 	}
 
 	json.NewEncoder(w).Encode(m)
+
+	return session
 }
 
 /*
 ChangeDir Changes to a certain directory (direct parent or child)
 */
 func ChangeDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	if form["dirname"] == nil {
 		IllegalArgumentsError(w)
 		return session
@@ -122,17 +133,19 @@ func ChangeDir(w http.ResponseWriter, r *http.Request, form url.Values, session 
 /*
 MakeDir Creates a specific directory
 */
-func MakeDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+func MakeDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	if form["dirname"] == nil {
 		IllegalArgumentsError(w)
-		return
+		return session
 	}
 
 	pathToDir := session.CWD + "/" + strings.Join(form["dirname"], "")
 	if entry, err := os.Stat(pathToDir); err == nil {
 		if entry.IsDir() {
 			FileExistError(w)
-			return
+			return session
 		}
 	}
 	os.Mkdir(pathToDir, os.ModeDir)
@@ -140,15 +153,19 @@ func MakeDir(w http.ResponseWriter, r *http.Request, form url.Values, session ut
 	w.WriteHeader(200)
 	m := utils.Response{Status: 200, Message: "Successfully created directory: " + strings.Join(form["dirname"], "")}
 	json.NewEncoder(w).Encode(m)
+
+	return session
 }
 
 /*
 RemoveDir Removes a specific directory
 */
-func RemoveDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+func RemoveDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	if form["dirname"] == nil {
 		IllegalArgumentsError(w)
-		return
+		return session
 	}
 
 	pathToDir := session.CWD + "/" + strings.Join(form["dirname"], "")
@@ -173,4 +190,6 @@ func RemoveDir(w http.ResponseWriter, r *http.Request, form url.Values, session 
 	} else {
 		FileNotFoundError(w) // other options not very possible
 	}
+
+	return session
 }

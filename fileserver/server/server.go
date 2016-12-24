@@ -89,8 +89,9 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 		return sessions
 	}
 	var session utils.Session
+	var index int
 	var exists bool
-	if session, _, exists = utils.SessionExist(sessions, strings.Join(r.URL.Query()["Token"], "")); !exists {
+	if session, index, exists = utils.SessionExist(sessions, strings.Join(r.URL.Query()["Token"], "")); !exists {
 		handlers.SessionNotFoundError(w)
 		return sessions
 	}
@@ -100,23 +101,26 @@ func handleGet(w http.ResponseWriter, r *http.Request, request string, sessions 
 	// Print Working Directory
 	case "pwd":
 		fmt.Println(">>> Print Working Directory")
-		handlers.PrintWorkingDirectory(w, r, session)
+		session = handlers.PrintWorkingDirectory(w, r, session)
 
 	// List all files under current directory
 	case "dir":
 		fmt.Println(">>> List Files")
-		handlers.ListFiles(w, r, session)
+		session = handlers.ListFiles(w, r, session)
 
 	// Download File
 	case "downfile":
 		fmt.Println(">>> Download File")
-		handlers.DownloadFile(w, r, session)
+		session = handlers.DownloadFile(w, r, session)
 
 	default:
 		handlers.UnknownCommandError(w)
+		session.LastUsed = time.Now()
 	}
 
-	// none of the actions will modify the session
+	// replace the session with updated one
+	sessions = utils.RemoveFromSlice(sessions, index)
+	sessions = append(sessions, session)
 
 	fmt.Printf("\n")
 	return sessions
@@ -145,37 +149,39 @@ func handlePost(w http.ResponseWriter, r *http.Request, request string, sessions
 	case "chdir":
 		fmt.Println(">>> Change Directory")
 		session = handlers.ChangeDir(w, r, r.Form, session)
-		sessions = utils.RemoveFromSlice(sessions, index)
-		sessions = append(sessions, session)
 
 	// Make Directory
 	case "mkdir":
 		fmt.Println(">>> Create Directory")
-		handlers.MakeDir(w, r, r.Form, session)
+		session = handlers.MakeDir(w, r, r.Form, session)
 
 	// Remove Directory
 	case "rmdir":
 		fmt.Println(">>> Remove Directory")
-		handlers.RemoveDir(w, r, r.Form, session)
+		session = handlers.RemoveDir(w, r, r.Form, session)
 
 	// Upload File
 	case "upfile":
 		fmt.Println(">>> Upload File")
-		handlers.UploadFile(w, r, session)
+		session = handlers.UploadFile(w, r, session)
 
 	// Remove File
 	case "rmfile":
 		fmt.Println(">>> Remove File")
-		handlers.RemoveFile(w, r, r.Form, session)
+		session = handlers.RemoveFile(w, r, r.Form, session)
 
 	// Move File (does not support rename)
 	case "mvfiledir":
 		fmt.Println(">>> Move File Or Dir")
-		handlers.MoveFileDir(w, r, r.Form, session)
+		session = handlers.MoveFileDir(w, r, r.Form, session)
 
 	default:
 		handlers.UnknownCommandError(w)
+		session.LastUsed = time.Now()
 	}
+
+	sessions = utils.RemoveFromSlice(sessions, index)
+	sessions = append(sessions, session)
 
 	fmt.Printf("\n")
 	return sessions

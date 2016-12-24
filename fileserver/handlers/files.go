@@ -17,15 +17,19 @@ import (
 	"os"
 	"strings"
 	"terrigenesis/fileserver/utils"
+	"time"
 )
 
 /*
 DownloadFile Handles requests to download a file
 */
-func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
+func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	var fileName []string
 	if fileName = r.URL.Query()["filename"]; fileName == nil {
 		IllegalArgumentsError(w)
+		return session
 	}
 
 	pathToFile := session.CWD + "/" + strings.Join(fileName, "")
@@ -36,17 +40,22 @@ func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session)
 		if !entry.IsDir() {
 			// is not directory
 			http.ServeFile(w, r, pathToFile)
+		} else {
+			FileTypeError(w)
 		}
-		FileTypeError(w)
+	} else {
+		FileNotFoundError(w)
 	}
 
-	FileNotFoundError(w)
+	return session
 }
 
 /*
 UploadFile Handles requests to upload file
 */
-func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
+func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	file, handler, err := r.FormFile("file")
 	defer file.Close()
 	if err != nil {
@@ -64,15 +73,19 @@ func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) {
 			json.NewEncoder(w).Encode(m)
 		}
 	}
+
+	return session
 }
 
 /*
 RemoveFile Handles requests to remove file
 */
-func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) utils.Session {
+	session.LastUsed = time.Now()
+
 	if form["filename"] == nil {
 		IllegalArgumentsError(w)
-		return
+		return session
 	}
 
 	pathToFile := session.CWD + "/" + strings.Join(form["filename"], "")
@@ -97,15 +110,17 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 	} else {
 		FileNotFoundError(w) // other options not very possible
 	}
+
+	return session
 }
 
 /*
 MoveFileDir Moves a specific file to a specific location
 */
-func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) {
+func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, session utils.Session) utils.Session {
 	if form["origin"] == nil || form["destination"] == nil {
 		IllegalArgumentsError(w)
-		return
+		return session
 	}
 
 	pointerSplited := strings.Split(session.CWD, "/")
@@ -123,7 +138,7 @@ func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, sessio
 				pointerSplited = pointerSplited[:len(pointerSplited)-1]
 			} else {
 				FolderPermissionError(w)
-				return
+				return session
 			}
 		} else {
 			// down one level
@@ -134,7 +149,7 @@ func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, sessio
 			} else {
 				// entry doesn't exist
 				FileNotFoundError(w)
-				return
+				return session
 			}
 		}
 	}
@@ -147,4 +162,6 @@ func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, sessio
 	} else {
 		GeneralError(w, 500, "Unable to move file/directory")
 	}
+
+	return session
 }
