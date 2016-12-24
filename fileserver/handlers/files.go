@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"terrigenesis/fileserver/utils"
 	"time"
@@ -88,6 +89,22 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 		return session
 	}
 
+	// if remove all contents
+	if strings.Compare(strings.Join(form["filename"], ""), "*") == 0 {
+		removeContents(session.CWD)
+		// w.Header().Set("Content-Type", "application/json")
+		var m utils.Response
+		// if err != nil {
+		w.WriteHeader(200)
+		m = utils.Response{Status: 200, Message: "Successfully removed all files"}
+		// } else {
+		// 	w.WriteHeader(500)
+		// 	m = utils.Response{Status: 500, Message: err.Error()}
+		// }
+		json.NewEncoder(w).Encode(m)
+		return session
+	}
+
 	pathToFile := session.CWD + "/" + strings.Join(form["filename"], "")
 	var entry os.FileInfo
 	var err error
@@ -97,6 +114,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 			// is not directory
 			if removeErr := os.Remove(pathToFile); removeErr != nil {
 				GeneralError(w, 500, removeErr)
+
 			} else {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(200)
@@ -112,6 +130,28 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 	}
 
 	return session
+}
+
+/*
+removeContents Removes all contents under a directory
+*/
+func removeContents(dirname string) error {
+	dir, err := os.Open(dirname)
+	if err != nil {
+		return err
+	}
+	defer dir.Close()
+	names, err := dir.Readdirnames(-1)
+	if err != nil {
+		return err
+	}
+	for _, name := range names {
+		err = os.RemoveAll(filepath.Join(dirname, name))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 /*

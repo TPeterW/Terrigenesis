@@ -116,7 +116,7 @@ func makePostRequest(timeout time.Duration, url string, formFields map[string]st
 	var target utils.Response
 	json.NewDecoder(resp.Body).Decode(&target)
 	if resp.StatusCode != http.StatusOK {
-		fmt.Print(target.Message)
+		fmt.Println(target.Message)
 		return utils.Response{}, false
 	}
 	return target, true

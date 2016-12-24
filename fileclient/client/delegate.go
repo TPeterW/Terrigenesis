@@ -122,3 +122,15 @@ func removeDir(del delegate, dirname string) {
 		fmt.Println(response.Message)
 	}
 }
+
+func removeFile(del delegate, args []string) {
+	form := make(map[string]string)
+	form["token"] = del.token
+
+	for _, filename := range strings.Split(strings.Join(args, " "), ",") {
+		filename = strings.TrimPrefix(filename, " ")
+		filename = strings.TrimSuffix(filename, " ")
+		form["filename"] = filename
+		makePostRequest(10*time.Second, "rmfile", form, "", del)
+	}
+}

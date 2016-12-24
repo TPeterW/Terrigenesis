@@ -82,10 +82,8 @@ func middleware(cmd string, del delegate) {
 	case "upfile":
 		if len(commands) < 2 {
 			fmt.Println("Missing filename")
-		} else if len(commands) > 2 {
-			fmt.Println("One file at a time")
 		} else {
-			uploadFile(del, commands[1])
+			uploadFile(del, strings.Join(commands[1:], " "))
 		}
 
 	case "cd":
@@ -115,6 +113,15 @@ func middleware(cmd string, del delegate) {
 			fmt.Println("Too many arguments for \"rmdir\"")
 		} else {
 			removeDir(del, commands[1])
+		}
+
+	case "rm":
+		fallthrough
+	case "rmfile":
+		if len(commands) < 2 {
+			fmt.Println("Too few arguments for \"" + commands[0] + "\"")
+		} else {
+			removeFile(del, commands[1:])
 		}
 
 	// TODO:
