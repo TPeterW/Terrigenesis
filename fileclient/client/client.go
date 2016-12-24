@@ -85,7 +85,7 @@ func middleware(cmd string, del delegate) {
 		fallthrough
 	case "chdir":
 		if len(commands) < 2 {
-			fmt.Println("Missing argument to \"" + commands[0] + "\"")
+			fmt.Println("Too few arguments for \"" + commands[0] + "\"")
 		} else if len(commands) > 2 {
 			fmt.Println("Too many arguments")
 		} else {
@@ -94,12 +94,22 @@ func middleware(cmd string, del delegate) {
 
 	case "mkdir":
 		if len(commands) < 2 {
-			fmt.Println("Missing argument to \"mkdir\"")
+			fmt.Println("Too few arguments for \"mkdir\"")
 		} else if len(commands) > 2 {
-			fmt.Println("Too many arguments")
+			fmt.Println("Too many arguments for \"mkdir\"")
 		} else {
 			makeDir(del, commands[1])
 		}
+
+	case "rmdir":
+		if len(commands) < 2 {
+			fmt.Println("Too few arguments for \"rmdir\"")
+		} else if len(commands) > 2 {
+			fmt.Println("Too many arguments for \"rmdir\"")
+		} else {
+			removeDir(del, commands[1])
+		}
+
 	// TODO:
 	default:
 		fmt.Println("Unrecognized command")

@@ -95,3 +95,17 @@ func makeDir(del delegate, dirname string) {
 
 	makePostRequest(10*time.Second, "mkdir", form, "", del)
 }
+
+/*
+removeDir Remove directory
+*/
+func removeDir(del delegate, dirname string) {
+	form := make(map[string]string)
+	form["token"] = del.token
+	form["dirname"] = dirname
+
+	response, ok := makePostRequest(10*time.Second, "rmdir", form, "", del)
+	if !ok {
+		fmt.Printf(response.Message)
+	}
+}
