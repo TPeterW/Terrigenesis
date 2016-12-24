@@ -8,7 +8,7 @@ import (
 )
 
 /*
-BasicAuth Middleware for handling http basic auth
+BasicAuth Middleware for handling http basic auth (unused)
 */
 func BasicAuth(r *http.Request) bool {
 	s := strings.SplitN(r.Header.Get("Authorization"), " ", 2)

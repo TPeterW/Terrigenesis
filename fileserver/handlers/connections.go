@@ -33,9 +33,7 @@ CloseConnection Handles connection terminalization
 */
 func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Session) []utils.Session {
 	w.Header().Set("Content-Type", "application/json")
-
-	m := utils.Response{Status: 200, Message: "Session not found"}
-	w.WriteHeader(404)
+	m := utils.Response{Status: 404, Message: "Session not found"}
 
 	for i := 0; i < len(sessions); i++ {
 		if sessions[i].Token == strings.Join(r.URL.Query()["Token"], "") {
@@ -45,6 +43,7 @@ func CloseConnection(w http.ResponseWriter, r *http.Request, sessions []utils.Se
 		}
 	}
 
+	w.WriteHeader(404)
 	json.NewEncoder(w).Encode(m)
 
 	return sessions

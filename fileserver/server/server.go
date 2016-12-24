@@ -10,6 +10,7 @@ import (
 	"strings"
 	"terrigenesis/fileserver/handlers"
 	"terrigenesis/fileserver/utils"
+	"terrigenesis/secrets"
 	"time"
 )
 
@@ -43,7 +44,8 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// basic authentication
-	if ok := utils.BasicAuth(r); ok {
+	username, password, ok := r.BasicAuth()
+	if ok && strings.Compare(username, secrets.Username()) == 0 && strings.Compare(password, secrets.Password()) == 0 {
 		fmt.Println(">>> Authentication Passed")
 	} else {
 		handlers.AuthenticationError(w)

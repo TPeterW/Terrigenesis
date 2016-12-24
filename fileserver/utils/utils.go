@@ -23,17 +23,6 @@ type Response struct {
 }
 
 /*
-PostBody Format for body of post request
-*/
-type PostBody struct {
-	Token    string // session token
-	Filename string // filename to move or delete
-	Dirname  string // dirname to move or delete
-	Dest     string // destination of moving
-	File     string // file to upload
-}
-
-/*
 SessionExist Check if a token is for one of the existinng sessions
 */
 func SessionExist(sessions []Session, token string) (Session, int, bool) {

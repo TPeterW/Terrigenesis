@@ -1,0 +1,77 @@
+package client
+
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"strings"
+	"terrigenesis/fileserver/utils"
+	"terrigenesis/secrets"
+	"time"
+)
+
+/*
+makeGetRequest Creates and sends GET requests, returns response
+*/
+func makeGetRequest(timeout time.Duration, url string, query url.Values, del delegate) (utils.Response, bool) {
+	client := http.Client{Timeout: timeout}
+	if !strings.HasPrefix(url, "/") {
+		url = "/" + url
+	}
+	req, err := http.NewRequest("GET", secrets.URL()+url, nil)
+	if err != nil {
+		fmt.Println("Cannot form request")
+		return utils.Response{}, false
+	}
+
+	req.SetBasicAuth(del.username, del.password)
+	req.URL.RawQuery = query.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending request")
+		return utils.Response{}, false
+	}
+
+	var target utils.Response
+	json.NewDecoder(resp.Body).Decode(&target)
+	if resp.StatusCode != 200 {
+		fmt.Println(resp.StatusCode)
+		fmt.Println(target.Message)
+		return utils.Response{}, false
+	}
+	return target, true
+}
+
+/*
+makePostRequest Creates and sends POST requests, returns response
+*/
+func makePostRequest(timeout time.Duration, url string, body io.Reader, del delegate) (utils.Response, bool) {
+	client := http.Client{Timeout: timeout}
+	if !strings.HasPrefix(url, "/") {
+		url = "/" + url
+	}
+	req, err := http.NewRequest("POST", secrets.URL()+url, body)
+	if err != nil {
+		fmt.Println("Cannot form request")
+		return utils.Response{}, false
+	}
+
+	req.SetBasicAuth(del.username, del.password)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Error sending request")
+		return utils.Response{}, false
+	}
+
+	var target utils.Response
+	json.NewDecoder(resp.Body).Decode(&target)
+	if resp.StatusCode != 200 {
+		fmt.Println(target.Message)
+		return utils.Response{}, false
+	}
+	return target, true
+}
