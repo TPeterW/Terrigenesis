@@ -80,6 +80,13 @@ func middleware(cmd string, del delegate) {
 	case "upload":
 		fallthrough
 	case "upfile":
+		if len(commands) < 2 {
+			fmt.Println("Missing filename")
+		} else if len(commands) > 2 {
+			fmt.Println("One file at a time")
+		} else {
+			uploadFile(del, commands[1])
+		}
 
 	case "cd":
 		fallthrough

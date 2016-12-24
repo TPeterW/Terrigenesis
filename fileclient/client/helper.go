@@ -4,9 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"os/user"
 	"strings"
 	"terrigenesis/fileserver/utils"
 	"terrigenesis/secrets"
@@ -55,20 +58,47 @@ func makePostRequest(timeout time.Duration, url string, formFields map[string]st
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
+
+	// form field data
 	for key, val := range formFields {
 		writer.WriteField(key, val)
 	}
 
-	req, err := http.NewRequest("POST", secrets.URL()+url, body)
-	if err != nil {
-		fmt.Println("Cannot form request")
-		return utils.Response{}, false
+	// form file data
+	if strings.Compare(filename, "") != 0 {
+		// substitute "~" with actual home directory
+		usr, err := user.Current()
+		if err != nil {
+			fmt.Println("SysErr: " + err.Error())
+		} else {
+			if strings.HasPrefix(filename, "~") {
+				filename = strings.Replace(filename, "~", usr.HomeDir, -1)
+			}
+		}
+
+		fileWriter, err := writer.CreateFormFile("file", strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1])
+		if err != nil {
+			fmt.Print("Error writing to buffer")
+			return utils.Response{}, false
+		}
+
+		f, err := os.Open(filename)
+		if err != nil {
+			fmt.Print(err.Error())
+			return utils.Response{}, false
+		}
+		_, err = io.Copy(fileWriter, f)
+		if err != nil {
+			fmt.Print("SysErr: " + err.Error())
+			return utils.Response{}, false
+		}
 	}
 
-	// TODO: upload file
-	// if strings.Compare(filename, "") != 0 {
-
-	// }
+	req, err := http.NewRequest("POST", secrets.URL()+url, body)
+	if err != nil {
+		fmt.Println("SysErr: " + err.Error())
+		return utils.Response{}, false
+	}
 
 	writer.Close()
 
@@ -79,15 +109,14 @@ func makePostRequest(timeout time.Duration, url string, formFields map[string]st
 	client := &http.Client{Timeout: timeout}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println(err)
-		fmt.Println("Error sending request")
+		fmt.Println("SysErr: " + err.Error())
 		return utils.Response{}, false
 	}
 
 	var target utils.Response
 	json.NewDecoder(resp.Body).Decode(&target)
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println(target.Message)
+		fmt.Print(target.Message)
 		return utils.Response{}, false
 	}
 	return target, true

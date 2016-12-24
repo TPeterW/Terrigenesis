@@ -98,10 +98,10 @@ func FileExistError(w http.ResponseWriter) {
 /*
 GeneralError Handles general type error
 */
-func GeneralError(w http.ResponseWriter, statusCode int, message string) {
-	fmt.Printf("General error, %s\n", message)
+func GeneralError(w http.ResponseWriter, statusCode int, err error) {
+	fmt.Printf("General error, %s\n", err.Error())
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	m := utils.Response{Status: statusCode, Message: message}
+	m := utils.Response{Status: statusCode, Message: err.Error()}
 	json.NewEncoder(w).Encode(m)
 }

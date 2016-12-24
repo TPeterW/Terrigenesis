@@ -176,7 +176,7 @@ func RemoveDir(w http.ResponseWriter, r *http.Request, form url.Values, session 
 		if entry.IsDir() {
 			// is actually a directory
 			if removeErr := os.Remove(pathToDir); removeErr != nil {
-				GeneralError(w, 500, "Error removing directory")
+				GeneralError(w, 500, removeErr)
 			} else {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(200)
@@ -185,7 +185,7 @@ func RemoveDir(w http.ResponseWriter, r *http.Request, form url.Values, session 
 			}
 		} else {
 			// is not directory
-			GeneralError(w, 500, "Directory is a file")
+			GeneralError(w, 500, err)
 		}
 	} else {
 		FileNotFoundError(w) // other options not very possible

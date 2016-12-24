@@ -59,12 +59,12 @@ func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) u
 	file, handler, err := r.FormFile("file")
 	defer file.Close()
 	if err != nil {
-		GeneralError(w, 500, "Error parsing file")
+		GeneralError(w, 500, err)
 	} else {
 		f, err := os.OpenFile(session.CWD+"/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
 		defer f.Close()
 		if err != nil {
-			GeneralError(w, 500, "Error writing file")
+			GeneralError(w, 500, err)
 		} else {
 			io.Copy(f, file)
 			w.Header().Set("Content-Type", "application/json")
@@ -96,7 +96,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 		if !entry.IsDir() {
 			// is not directory
 			if removeErr := os.Remove(pathToFile); removeErr != nil {
-				GeneralError(w, 500, "Error removing file")
+				GeneralError(w, 500, removeErr)
 			} else {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(200)
@@ -105,7 +105,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 			}
 		} else {
 			// is directory
-			GeneralError(w, 500, "File is a directory")
+			GeneralError(w, 500, err)
 		}
 	} else {
 		FileNotFoundError(w) // other options not very possible
@@ -160,7 +160,7 @@ func MoveFileDir(w http.ResponseWriter, r *http.Request, form url.Values, sessio
 		m := utils.Response{Status: 200, Message: "Successfully moved file/directory"}
 		json.NewEncoder(w).Encode(m)
 	} else {
-		GeneralError(w, 500, "Unable to move file/directory")
+		GeneralError(w, 500, err)
 	}
 
 	return session

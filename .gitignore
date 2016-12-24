@@ -3,6 +3,7 @@
 
 # File directory
 db/
+*.png
 
 # Encrption
 secrets/

@@ -75,6 +75,19 @@ func listFiles(del delegate) {
 }
 
 /*
+uploadFile Upload file
+*/
+func uploadFile(del delegate, filename string) {
+	form := make(map[string]string)
+	form["token"] = del.token
+
+	response, ok := makePostRequest(60*time.Second, "upfile", form, filename, del)
+	if !ok {
+		fmt.Println(response.Message)
+	}
+}
+
+/*
 changeDir Change directory
 */
 func changeDir(del delegate, dirname string) {
@@ -106,6 +119,6 @@ func removeDir(del delegate, dirname string) {
 
 	response, ok := makePostRequest(10*time.Second, "rmdir", form, "", del)
 	if !ok {
-		fmt.Printf(response.Message)
+		fmt.Println(response.Message)
 	}
 }
