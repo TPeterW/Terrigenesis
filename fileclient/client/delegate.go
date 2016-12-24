@@ -2,7 +2,10 @@ package client
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"net/url"
+	"os/user"
 	"strings"
 	"terrigenesis/fileserver/utils"
 	"time"
@@ -35,10 +38,10 @@ closeConnection Close connection
 */
 func closeConnection(del delegate) bool {
 	var ok bool
-	query := url.Values{}
+	query := make(url.Values)
 	query.Add("Token", del.token)
 
-	_, ok = makeGetRequest(10*time.Second, "/closecon", query, del)
+	_, _, ok = makeGetRequest(10*time.Second, "/closecon", query, del)
 	return ok
 }
 
@@ -48,10 +51,10 @@ printWorkingDirectory Print working directory
 func printWorkingDirectory(del delegate) {
 	var target utils.Response
 	var ok bool
-	query := url.Values{}
+	query := make(url.Values)
 	query.Add("Token", del.token)
 
-	target, ok = makeGetRequest(10*time.Second, "pwd", query, del)
+	_, target, ok = makeGetRequest(10*time.Second, "pwd", query, del)
 	if ok {
 		fmt.Println(target.CWD)
 	}
@@ -63,14 +66,59 @@ listFiles List files
 func listFiles(del delegate) {
 	var target utils.Response
 	var ok bool
-	query := url.Values{}
+	query := make(url.Values)
 	query.Add("Token", del.token)
 
-	target, ok = makeGetRequest(10*time.Second, "dir", query, del)
+	_, target, ok = makeGetRequest(10*time.Second, "dir", query, del)
 	if ok {
 		if len(target.DirFiles) > 0 {
 			fmt.Printf(strings.Join(target.DirFiles, "\t") + "\n")
 		}
+	}
+}
+
+/*
+downloadFile Download file
+*/
+func downloadFile(del delegate, filename string) {
+	// substitute "~" with actual home directory
+	usr, err := user.Current()
+	if err != nil {
+		fmt.Println("SysErr: " + err.Error())
+		return
+	}
+
+	var resp *http.Response
+	var target utils.Response
+	var ok bool
+	query := make(url.Values)
+	query.Add("Token", del.token)
+	query.Add("filename", filename)
+	resp, target, ok = makeGetRequest(30*time.Second, "downfile", query, del)
+
+	if ok {
+		fileBytes, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			fmt.Println("SysErr: " + err.Error())
+		} else {
+			ioutil.WriteFile(usr.HomeDir+"/Downloads/"+strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1], fileBytes, 0666)
+		}
+
+		// out, err := os.OpenFile(usr.HomeDir+"/Downloads/"+strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1], os.O_RDWR|os.O_CREATE, 0666)
+		// defer out.Close()
+
+		// if err != nil {
+		// 	fmt.Println("SysErr: " + err.Error())
+		// 	os.Remove(usr.HomeDir + "/Downloads/" + strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1])
+		// } else {
+		// 	_, err = io.Copy(out, body)
+		// 	if err != nil {
+		// 		fmt.Println("SysErr: " + err.Error())
+		// 		os.Remove(usr.HomeDir + "/Downloads/" + strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1])
+		// 	}
+		// }
+	} else {
+		fmt.Print(target.Message)
 	}
 }
 

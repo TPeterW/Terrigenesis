@@ -53,6 +53,7 @@ func mainHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(">>> Authentication Passed")
 	} else {
 		handlers.AuthenticationError(w)
+		fmt.Println()
 		return
 	}
 

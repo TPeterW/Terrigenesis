@@ -33,7 +33,7 @@ func DownloadFile(w http.ResponseWriter, r *http.Request, session utils.Session)
 		return session
 	}
 
-	pathToFile := session.CWD + "/" + strings.Join(fileName, "")
+	pathToFile := session.CWD + "/" + strings.Join(fileName, " ")
 	var entry os.FileInfo
 	var err error
 	if entry, err = os.Stat(pathToFile); err == nil {

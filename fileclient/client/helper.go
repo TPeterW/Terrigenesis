@@ -19,7 +19,7 @@ import (
 /*
 makeGetRequest Creates and sends GET requests, returns response
 */
-func makeGetRequest(timeout time.Duration, url string, query url.Values, del delegate) (utils.Response, bool) {
+func makeGetRequest(timeout time.Duration, url string, query url.Values, del delegate) (*http.Response, utils.Response, bool) {
 	client := http.Client{Timeout: timeout}
 	if !strings.HasPrefix(url, "/") {
 		url = "/" + url
@@ -27,7 +27,7 @@ func makeGetRequest(timeout time.Duration, url string, query url.Values, del del
 	req, err := http.NewRequest("GET", secrets.URL()+url, nil)
 	if err != nil {
 		fmt.Println("Cannot form request")
-		return utils.Response{}, false
+		return nil, utils.Response{}, false
 	}
 
 	req.SetBasicAuth(del.username, del.password)
@@ -36,16 +36,20 @@ func makeGetRequest(timeout time.Duration, url string, query url.Values, del del
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error sending request")
-		return utils.Response{}, false
+		return resp, utils.Response{}, false
+	}
+
+	if strings.Compare(url, "/downfile") == 0 {
+		return resp, utils.Response{}, true
 	}
 
 	var target utils.Response
 	json.NewDecoder(resp.Body).Decode(&target)
 	if resp.StatusCode != http.StatusOK {
 		fmt.Println(target.Message)
-		return utils.Response{}, false
+		return resp, utils.Response{}, false
 	}
-	return target, true
+	return resp, target, true
 }
 
 /*
