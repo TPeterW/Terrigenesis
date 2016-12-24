@@ -103,20 +103,6 @@ func downloadFile(del delegate, filename string) {
 		} else {
 			ioutil.WriteFile(usr.HomeDir+"/Downloads/"+strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1], fileBytes, 0666)
 		}
-
-		// out, err := os.OpenFile(usr.HomeDir+"/Downloads/"+strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1], os.O_RDWR|os.O_CREATE, 0666)
-		// defer out.Close()
-
-		// if err != nil {
-		// 	fmt.Println("SysErr: " + err.Error())
-		// 	os.Remove(usr.HomeDir + "/Downloads/" + strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1])
-		// } else {
-		// 	_, err = io.Copy(out, body)
-		// 	if err != nil {
-		// 		fmt.Println("SysErr: " + err.Error())
-		// 		os.Remove(usr.HomeDir + "/Downloads/" + strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1])
-		// 	}
-		// }
 	} else {
 		fmt.Print(target.Message)
 	}
