@@ -9,6 +9,8 @@ import (
 	"syscall"
 	"terrigenesis/secrets"
 
+	"path/filepath"
+
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -76,6 +78,12 @@ func middleware(cmd string, del delegate) {
 	case "download":
 		fallthrough
 	case "downfile":
+		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			fmt.Println("SysErr: ", err.Error())
+		} else {
+			fmt.Println(dir)
+		}
 
 	case "upload":
 		fallthrough

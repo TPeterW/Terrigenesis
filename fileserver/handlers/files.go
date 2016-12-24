@@ -91,16 +91,16 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 
 	// if remove all contents
 	if strings.Compare(strings.Join(form["filename"], ""), "*") == 0 {
-		removeContents(session.CWD)
-		// w.Header().Set("Content-Type", "application/json")
+		err := removeContents(session.CWD)
+		w.Header().Set("Content-Type", "application/json")
 		var m utils.Response
-		// if err != nil {
-		w.WriteHeader(200)
-		m = utils.Response{Status: 200, Message: "Successfully removed all files"}
-		// } else {
-		// 	w.WriteHeader(500)
-		// 	m = utils.Response{Status: 500, Message: err.Error()}
-		// }
+		if err == nil {
+			w.WriteHeader(200)
+			m = utils.Response{Status: 200, Message: "Successfully removed all files"}
+		} else {
+			w.WriteHeader(500)
+			m = utils.Response{Status: 500, Message: err.Error()}
+		}
 		json.NewEncoder(w).Encode(m)
 		return session
 	}
