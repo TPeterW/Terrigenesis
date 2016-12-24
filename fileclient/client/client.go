@@ -105,7 +105,7 @@ func handleInterrupt(del delegate) {
 					fmt.Println("Shutting down client...")
 					os.Exit(0)
 				} else {
-					fmt.Printf("Failed to close session\n>>> ")
+					fmt.Printf("Failed to close session\n")
 					os.Exit(1)
 				}
 			}

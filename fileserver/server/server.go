@@ -15,12 +15,16 @@ import (
 )
 
 var sessions []utils.Session
+var quit chan struct{}
 
 /*
 StartServer Entry point for fileserver
 */
 func StartServer() {
 	handleInterrupt()
+
+	quit = make(chan struct{})
+	startTicker(quit)
 
 	// initialize session list
 	sessions := make([]utils.Session, 0)
@@ -201,7 +205,30 @@ func handleInterrupt() {
 		for sig := range c {
 			if sig != nil {
 				fmt.Println("\rShutting down server...")
+				close(quit)
 				os.Exit(0)
+			}
+		}
+	}()
+}
+
+func startTicker(quit chan struct{}) {
+	ticker := time.NewTicker(1 * time.Second)
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				for index, session := range sessions {
+					// without action for 5 minutes
+					if time.Since(session.LastUsed).Minutes() > 5 {
+						sessions = utils.RemoveFromSlice(sessions, index)
+						fmt.Printf("Session %v timed out\n\n", session)
+					}
+				}
+			case <-quit:
+				ticker.Stop()
+				return
 			}
 		}
 	}()

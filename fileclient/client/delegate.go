@@ -69,22 +69,16 @@ func listFiles(del delegate) {
 	target, ok = makeGetRequest(10*time.Second, "dir", query, del)
 	if ok {
 		if len(target.DirFiles) > 0 {
-			fmt.Printf(strings.Join(target.DirFiles, "\t") + "\n>>> ")
-		} else {
-			fmt.Printf(">>> ")
+			fmt.Printf(strings.Join(target.DirFiles, "\t") + "\n")
 		}
 	}
+	fmt.Printf(">>> ")
 }
 
 /*
 changeDir Change directory
 */
 func changeDir(del delegate, dirname string) {
-	// bodyBuf := &bytes.Buffer{}
-	// bodyWriter := multipart.NewWriter(bodyBuf)
-	// bodyWriter.WriteField("token", del.token)
-	// bodyWriter.WriteField("dirname", dirname)
-
 	form := make(map[string]string)
 	form["token"] = del.token
 	form["dirname"] = dirname

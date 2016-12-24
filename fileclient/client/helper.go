@@ -39,7 +39,6 @@ func makeGetRequest(timeout time.Duration, url string, query url.Values, del del
 	var target utils.Response
 	json.NewDecoder(resp.Body).Decode(&target)
 	if resp.StatusCode != http.StatusOK {
-		fmt.Println(resp.StatusCode)
 		fmt.Println(target.Message)
 		return utils.Response{}, false
 	}
