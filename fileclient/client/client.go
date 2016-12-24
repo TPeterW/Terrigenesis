@@ -40,7 +40,7 @@ func StartClient(args []string) {
 	doExit := false
 	for !doExit {
 		reader := bufio.NewReader(os.Stdin)
-		for text, _ := reader.ReadString('\n'); strings.Compare(strings.TrimSuffix(text, "\n"), "closecon") != 0; text, _ = reader.ReadString('\n') {
+		for text, _ := reader.ReadString('\n'); strings.Compare(strings.TrimSuffix(text, "\n"), "closecon") != 0 && strings.Compare(strings.TrimSuffix(text, "\n"), "exit") != 0; text, _ = reader.ReadString('\n') {
 			text = strings.TrimSuffix(text, "\n")
 			middleware(text, del)
 		}
@@ -59,10 +59,34 @@ func StartClient(args []string) {
 middleware Does different things depending on the request
 */
 func middleware(cmd string, del delegate) {
-	// TODO:
-	switch cmd {
+	commands := strings.Split(cmd, " ")
+	switch commands[0] {
 	case "pwd":
 		printWorkingDirectory(del)
+
+	case "ls":
+		fallthrough
+	case "dir":
+		if len(commands) > 1 {
+			fmt.Printf("Unrecognized command \"%s\"\n>>> ", commands[1])
+		} else {
+			listFiles(del)
+		}
+
+	case "downfile":
+
+	case "upfile":
+
+	case "cd":
+		fallthrough
+	case "chdir":
+		if len(commands) < 2 {
+			fmt.Printf("Missing argument to \"%s\"\n>>> ", commands[0])
+		} else if len(commands) > 2 {
+			fmt.Println("Too many arguments")
+		} else {
+			changeDir(del, commands[1])
+		}
 	// TODO:
 	default:
 		fmt.Printf("Unrecognized command\n>>> ")
@@ -82,6 +106,7 @@ func handleInterrupt(del delegate) {
 					os.Exit(0)
 				} else {
 					fmt.Printf("Failed to close session\n>>> ")
+					os.Exit(1)
 				}
 			}
 		}
