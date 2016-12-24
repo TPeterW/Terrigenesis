@@ -68,29 +68,43 @@ func middleware(cmd string, del delegate) {
 		fallthrough
 	case "dir":
 		if len(commands) > 1 {
-			fmt.Printf("Unrecognized command \"%s\"\n>>> ", commands[1])
+			fmt.Println("Unrecognized command \"" + commands[1] + "\"")
 		} else {
 			listFiles(del)
 		}
 
+	case "download":
+		fallthrough
 	case "downfile":
 
+	case "upload":
+		fallthrough
 	case "upfile":
 
 	case "cd":
 		fallthrough
 	case "chdir":
 		if len(commands) < 2 {
-			fmt.Printf("Missing argument to \"%s\"\n>>> ", commands[0])
+			fmt.Println("Missing argument to \"" + commands[0] + "\"")
 		} else if len(commands) > 2 {
 			fmt.Println("Too many arguments")
 		} else {
 			changeDir(del, commands[1])
 		}
+
+	case "mkdir":
+		if len(commands) < 2 {
+			fmt.Println("Missing argument to \"mkdir\"")
+		} else if len(commands) > 2 {
+			fmt.Println("Too many arguments")
+		} else {
+			makeDir(del, commands[1])
+		}
 	// TODO:
 	default:
-		fmt.Printf("Unrecognized command\n>>> ")
+		fmt.Println("Unrecognized command")
 	}
+	fmt.Printf(">>> ")
 }
 
 func handleInterrupt(del delegate) {

@@ -53,7 +53,7 @@ func printWorkingDirectory(del delegate) {
 
 	target, ok = makeGetRequest(10*time.Second, "pwd", query, del)
 	if ok {
-		fmt.Printf(target.CWD + "\n>>> ")
+		fmt.Println(target.CWD)
 	}
 }
 
@@ -72,7 +72,6 @@ func listFiles(del delegate) {
 			fmt.Printf(strings.Join(target.DirFiles, "\t") + "\n")
 		}
 	}
-	fmt.Printf(">>> ")
 }
 
 /*
@@ -84,5 +83,15 @@ func changeDir(del delegate, dirname string) {
 	form["dirname"] = dirname
 
 	makePostRequest(10*time.Second, "chdir", form, "", del)
-	fmt.Printf(">>> ")
+}
+
+/*
+makeDir Make directory
+*/
+func makeDir(del delegate, dirname string) {
+	form := make(map[string]string)
+	form["token"] = del.token
+	form["dirname"] = dirname
+
+	makePostRequest(10*time.Second, "mkdir", form, "", del)
 }
