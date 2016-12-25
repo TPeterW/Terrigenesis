@@ -102,6 +102,6 @@ func GeneralError(w http.ResponseWriter, statusCode int, err error) {
 	fmt.Printf("General error, %s\n", err.Error())
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	m := utils.Response{Status: statusCode, Message: err.Error()}
+	m := utils.Response{Status: statusCode, Message: "General error -> " + err.Error()}
 	json.NewEncoder(w).Encode(m)
 }

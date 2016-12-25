@@ -99,7 +99,7 @@ func RemoveFile(w http.ResponseWriter, r *http.Request, form url.Values, session
 			m = utils.Response{Status: 200, Message: "Successfully removed all files"}
 		} else {
 			w.WriteHeader(500)
-			m = utils.Response{Status: 500, Message: err.Error()}
+			m = utils.Response{Status: 500, Message: "Failed to remove all files"}
 		}
 		json.NewEncoder(w).Encode(m)
 		return session
