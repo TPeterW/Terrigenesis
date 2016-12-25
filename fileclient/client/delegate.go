@@ -153,7 +153,7 @@ func removeDir(del delegate, dirname string) {
 
 	response, ok := makePostRequest(10*time.Second, "rmdir", form, "", del)
 	if !ok {
-		fmt.Println(response.Message)
+		fmt.Print(response.Message)
 	}
 }
 

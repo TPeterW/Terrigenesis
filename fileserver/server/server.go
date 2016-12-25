@@ -26,6 +26,8 @@ func StartServer() {
 	quit = make(chan struct{})
 	startTicker(quit)
 
+	checkAndCreateDBDirectory()
+
 	// initialize session list
 	sessions := make([]utils.Session, 0)
 
@@ -233,6 +235,18 @@ func startTicker(quit chan struct{}) {
 			}
 		}
 	}()
+}
+
+func checkAndCreateDBDirectory() {
+	info, err := os.Stat("./db")
+	if err != nil {
+		os.Mkdir("./db", 0666)
+	} else {
+		if !info.IsDir() {
+			os.Remove("./db")
+			os.Mkdir("./db", 0666)
+		}
+	}
 }
 
 func check(err error) {
