@@ -68,7 +68,7 @@ func middleware(cmd string, del delegate) {
 		fallthrough
 	case "dir":
 		if len(commands) > 1 {
-			fmt.Println("Unrecognized command \"" + commands[1] + "\"")
+			fmt.Println("Too many arguments for \"" + commands[1] + "\"")
 		} else {
 			listFiles(del)
 		}
