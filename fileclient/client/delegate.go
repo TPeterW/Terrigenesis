@@ -157,6 +157,9 @@ func removeDir(del delegate, dirname string) {
 	}
 }
 
+/*
+removeFile Remove file
+*/
 func removeFile(del delegate, args []string) {
 	form := make(map[string]string)
 	form["token"] = del.token
@@ -166,5 +169,24 @@ func removeFile(del delegate, args []string) {
 		filename = strings.TrimSuffix(filename, " ")
 		form["filename"] = filename
 		makePostRequest(10*time.Second, "rmfile", form, "", del)
+	}
+}
+
+/*
+moveFileOrDir Move file or directory
+*/
+func moveFileOrDir(del delegate, args []string, command string) {
+	form := make(map[string]string)
+	form["token"] = del.token
+
+	args = strings.Split(strings.Join(args, " "), ",")
+	if len(args) > 2 {
+		fmt.Println("Too many arguments for \"" + command + "\"")
+	} else if len(args) < 2 {
+		fmt.Println("Too few arguments for \"" + command + "\"")
+	} else {
+		form["origin"] = args[0]
+		form["destination"] = strings.TrimPrefix(args[1], " ")
+		makePostRequest(20*time.Second, "mvfiledir", form, "", del)
 	}
 }

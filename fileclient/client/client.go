@@ -129,6 +129,15 @@ func middleware(cmd string, del delegate) {
 			removeFile(del, commands[1:])
 		}
 
+	case "mv":
+		fallthrough
+	case "mvfiledir":
+		if len(commands) < 3 {
+			fmt.Println("Too few arguments for \"" + commands[0] + "\"")
+		} else {
+			moveFileOrDir(del, commands[1:], commands[0])
+		}
+
 	// TODO:
 	default:
 		fmt.Println("Unrecognized command")
