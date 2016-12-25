@@ -138,7 +138,6 @@ func middleware(cmd string, del delegate) {
 			moveFileOrDir(del, commands[1:], commands[0])
 		}
 
-	// TODO:
 	default:
 		fmt.Println("Unrecognized command")
 	}
