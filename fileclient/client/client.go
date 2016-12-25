@@ -61,6 +61,19 @@ middleware Does different things depending on the request
 func middleware(cmd string, del delegate) {
 	commands := strings.Split(cmd, " ")
 	switch commands[0] {
+	case "":
+		break
+	case "help":
+		fmt.Println("pwd\t\t: []\t\t\t- print working directory")
+		fmt.Println("ch, chdir\t: [dirname]\t\t- change into directory")
+		fmt.Println("ls, dir\t\t: []\t\t\t- list files under current directory")
+		fmt.Println("mkdir\t\t: [dirname]\t\t- create new directory")
+		fmt.Println("rmdir\t\t: [dirname]\t\t- remove a directory")
+		fmt.Println("rm, rmfile\t: [filename]\t\t- remove a file")
+		fmt.Println("mv, mvfiledir\t: [filename] [destination] - moves a file or directory (no renaming)")
+		fmt.Println("download\t: [filename]\t\t- download a file to local Downloads folder")
+		fmt.Println("upload\t\t: [pathToFile]\t\t- upload a local file to server")
+		// TODO:
 	case "pwd":
 		printWorkingDirectory(del)
 
