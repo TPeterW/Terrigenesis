@@ -62,7 +62,7 @@ func UploadFile(w http.ResponseWriter, r *http.Request, session utils.Session) u
 	if err != nil {
 		GeneralError(w, 500, err)
 	} else {
-		f, err := os.OpenFile(session.CWD+"/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+		f, err := os.OpenFile(session.CWD+"/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0744)
 		defer f.Close()
 		if err != nil {
 			GeneralError(w, 500, err)

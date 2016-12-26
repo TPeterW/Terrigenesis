@@ -148,7 +148,7 @@ func MakeDir(w http.ResponseWriter, r *http.Request, form url.Values, session ut
 			return session
 		}
 	}
-	os.Mkdir(pathToDir, os.ModeDir)
+	os.Mkdir(pathToDir, os.ModePerm)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 	m := utils.Response{Status: 200, Message: "Successfully created directory: " + strings.Join(form["dirname"], "")}
