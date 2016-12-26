@@ -240,11 +240,11 @@ func startTicker(quit chan struct{}) {
 func checkAndCreateDBDirectory() {
 	info, err := os.Stat("./db")
 	if err != nil {
-		os.Mkdir("./db", 0666)
+		os.Mkdir("./db", 0744)
 	} else {
 		if !info.IsDir() {
 			os.Remove("./db")
-			os.Mkdir("./db", 0666)
+			os.Mkdir("./db", 0744)
 		}
 	}
 }
