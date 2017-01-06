@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -98,8 +99,14 @@ func downloadFile(del delegate, filename string) {
 
 	if ok {
 		fileBytes, err := ioutil.ReadAll(resp.Body)
+
+		resp := utils.Response{}
+		jerr := json.Unmarshal(fileBytes, &resp)
+
 		if err != nil {
 			fmt.Println("SysErr: " + err.Error())
+		} else if jerr == nil && resp.Status != 200 {
+			fmt.Println(resp.Message)
 		} else {
 			ioutil.WriteFile(usr.HomeDir+"/Downloads/"+strings.Split(filename, "/")[len(strings.Split(filename, "/"))-1], fileBytes, 0666)
 		}
