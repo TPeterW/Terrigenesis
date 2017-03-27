@@ -65,7 +65,7 @@ func middleware(cmd string, del delegate) {
 		break
 	case "help":
 		fmt.Println("pwd\t\t: []\t\t\t- print working directory")
-		fmt.Println("ch, chdir\t: [dirname]\t\t- change into directory")
+		fmt.Println("cd, chdir\t: [dirname]\t\t- change into directory")
 		fmt.Println("ls, dir\t\t: []\t\t\t- list files under current directory")
 		fmt.Println("mkdir\t\t: [dirname]\t\t- create new directory")
 		fmt.Println("rmdir\t\t: [dirname]\t\t- remove a directory")
