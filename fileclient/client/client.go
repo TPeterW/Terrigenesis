@@ -73,7 +73,7 @@ func middleware(cmd string, del delegate) {
 		fmt.Println("mv, mvfiledir\t: [filename] [destination] - moves a file or directory (no renaming)")
 		fmt.Println("download\t: [filename]\t\t- download a file to local Downloads folder")
 		fmt.Println("upload\t\t: [pathToFile]\t\t- upload a local file to server")
-		// TODO:
+
 	case "pwd":
 		printWorkingDirectory(del)
 
