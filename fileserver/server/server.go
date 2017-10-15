@@ -32,7 +32,7 @@ func StartServer() {
 	sessions := make([]utils.Session, 0)
 
 	// port number
-	portNum := 3000
+	portNum := secrets.Port()
 
 	fmt.Println("Listening on port " + strconv.Itoa(portNum))
 	fmt.Printf("Current sessions %v\n", sessions)
