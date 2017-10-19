@@ -70,7 +70,7 @@ func middleware(cmd string, del delegate) {
 		fmt.Println("mkdir\t\t: [dirname]\t\t- create new directory")
 		fmt.Println("rmdir\t\t: [dirname]\t\t- remove a directory")
 		fmt.Println("rm, rmfile\t: [filename]\t\t- remove a file")
-		fmt.Println("mv, mvfiledir\t: [filename] [destination] - moves a file or directory (no renaming)")
+		fmt.Println("mv, mvfiledir\t: [filename], [destination] - moves a file or directory (no renaming)")
 		fmt.Println("download\t: [filename]\t\t- download a file to local Downloads folder")
 		fmt.Println("upload\t\t: [pathToFile]\t\t- upload a local file to server")
 
