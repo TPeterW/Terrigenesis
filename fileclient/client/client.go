@@ -37,6 +37,7 @@ func StartClient(args []string) {
 		handleInterrupt(del)
 	}
 
+	// TODO: support up and down history search
 	doExit := false
 	for !doExit {
 		reader := bufio.NewReader(os.Stdin)
